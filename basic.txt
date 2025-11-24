@@ -28,14 +28,14 @@
             mov r1
             # Ustawienie gotowosci r2 -> Skopiowowanie wartosci z r1 do r2
     }
-    store = 0x03 {
+    store = 0x04 {
         # Zapis wartosci do pamieci ram
         # Aby cos zapisac trzeba ustawic rejestr
 
         set r1
         store 0xF0 / store 120
     }
-    load = 0x04 {
+    load = 0x05 {
         # Wczytanie wartosci z pamieci ram
         # Aby cos zaladowac trzeba ustawic rejestr
 

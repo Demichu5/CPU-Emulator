@@ -1,7 +1,6 @@
 Core_cpu_ramSpace = [0]*1*1024
 Core_cpu_stack = []
 
-
 Core_cpu_ramSpace[0] = 1; Core_cpu_ramSpace[1] = 1      #set r1
 Core_cpu_ramSpace[2] = 2; Core_cpu_ramSpace[3] = 0      #mov 0
 Core_cpu_ramSpace[4] = 1; Core_cpu_ramSpace[5] = 2      #set r2

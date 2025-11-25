@@ -1,27 +1,29 @@
 Core_cpu_ramSpace = [0]*1*1024
 Core_cpu_stack = []
 
-Core_cpu_ramSpace[0] = 1; Core_cpu_ramSpace[1] = 1      #set r1
-Core_cpu_ramSpace[2] = 2; Core_cpu_ramSpace[3] = 0      #mov 0
-Core_cpu_ramSpace[4] = 1; Core_cpu_ramSpace[5] = 2      #set r2
-Core_cpu_ramSpace[6] = 2; Core_cpu_ramSpace[7] = 3      #mov 3
-Core_cpu_ramSpace[8] = 1; Core_cpu_ramSpace[9] = 3      #set r3 
-Core_cpu_ramSpace[10] = 2; Core_cpu_ramSpace[11] = 12   #mov 12
+Core_cpu_ramSpace[0] = 1; Core_cpu_ramSpace[1] = 1          #set r1
+Core_cpu_ramSpace[2] = 2; Core_cpu_ramSpace[3] = 0          #mov 0
+Core_cpu_ramSpace[4] = 1; Core_cpu_ramSpace[5] = 2          #set r2
+Core_cpu_ramSpace[6] = 2; Core_cpu_ramSpace[7] = 3          #mov 3
+Core_cpu_ramSpace[8] = 1; Core_cpu_ramSpace[9] = 3          #set r3 
+Core_cpu_ramSpace[10] = 2; Core_cpu_ramSpace[11] = 12       #mov 12
 
-Core_cpu_ramSpace[12] = 19; Core_cpu_ramSpace[13] = 3   #alu_sub_a r3
-Core_cpu_ramSpace[14] = 20; Core_cpu_ramSpace[15] = 2   #alu_sub_b r2
+Core_cpu_ramSpace[12] = 19; Core_cpu_ramSpace[13] = 3       #alu_sub_a r3
+Core_cpu_ramSpace[14] = 20; Core_cpu_ramSpace[15] = 2       #alu_sub_b r2
 
-Core_cpu_ramSpace[16] = 1; Core_cpu_ramSpace[17] = 1    #set r1
-Core_cpu_ramSpace[18] = 39; Core_cpu_ramSpace[19] = 0     #inc
+Core_cpu_ramSpace[16] = 1; Core_cpu_ramSpace[17] = 1        #set r1
+Core_cpu_ramSpace[18] = 39; Core_cpu_ramSpace[19] = 0       #inc
 
-Core_cpu_ramSpace[20] = 37; Core_cpu_ramSpace[21] = 1     #cmp_a r1
-Core_cpu_ramSpace[22] = 38; Core_cpu_ramSpace[23] = 2     #cmp_b r2
-Core_cpu_ramSpace[24] = 35; Core_cpu_ramSpace[25] = 12    #jmp_c 12
+Core_cpu_ramSpace[20] = 37; Core_cpu_ramSpace[21] = 1       #cmp_a r1
+Core_cpu_ramSpace[22] = 38; Core_cpu_ramSpace[23] = 2       #cmp_b r2
+Core_cpu_ramSpace[24] = 35; Core_cpu_ramSpace[25] = 12      #jmp_c 12
 
 Core_cpu_ramSpace[26] = 1; Core_cpu_ramSpace[27] = 9        #set s1
 Core_cpu_ramSpace[28] = 2; Core_cpu_ramSpace[29] = 100      #mov 100
+Core_cpu_ramSpace[30] = 1; Core_cpu_ramSpace[31] = 2        #set r1
+Core_cpu_ramSpace[32] = 2; Core_cpu_ramSpace[33] = 0        #mov 0
 
-Core_cpu_ramSpace[30] = 0; Core_cpu_ramSpace[31] = 0      #halt
+Core_cpu_ramSpace[34] = 0; Core_cpu_ramSpace[35] = 0        #halt
 
 Core_CPU_rejestrs = {
     #Hardware

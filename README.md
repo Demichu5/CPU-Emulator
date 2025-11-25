@@ -1,6 +1,7 @@
 # Emulator CPU – README
 
 Poniżej znajduje się kompletna dokumentacja: opis projektu, struktura plików, zasada działania CPU, assembler, instrukcje, pipeline oraz sposób użycia.
+Z rzeczy do zrobienia bedzie dodanie Interruptow biosowych, Keyboard Service, Video Service, Disk Service, oraz dodanie gui w Raylib ktory bedzie emulowal ekran.
 
 ---
 

@@ -1,0 +1,51 @@
+#8BIT_KOMPUTER
+
+#POCZĄTEK - BINAR
+
+	7	6	5	4	3	2	1	0
+	|	|	|	|	|	|	|	|
+	128	64	32	16	8	4	2	1
+
+#CYKL MASZYNOWY
+	
+	Cykl maszynowy "Cm" == wykonanie instrukcji np. PUTr_15_R1
+	Cykl zegara "Cz" == generowanie impulsu co ~ 1. sekundę
+
+#RAM - SKRÓT
+
+	Dane: 256 Bajtów
+	Dane: 2048 Bitów
+	Komórka: 8 Bitów
+
+	+-------+-------+
+	| 8 Bit | 8 Bit |
+	| numer | dane  |
+	+-------+-------+
+
+#RAM - MODUŁ
+	
+	+---+-----------+	+---+-----------+	+---+-----------+	+---+-----------+
+	|R- |  	       1|	|R5 |  	       2|	|R2 |  	       3|	|R4 |  	       4|
+	+---+-----------+	+---+-----------+	+---+-----------+	+---+-----------+
+	| rozmiar: 1B	|	| rozmiar: 2B	|	| rozmiar: 4B	|	| rozmiar: 8B	|
+	+---------------+	+---------------+	+---------------+	+---------------+
+
+	+---+-----------+	+---+-----------+	+---+-----------+	+---+-----------+
+	|R4 |  	       5|	|R1 |  	       6|	|R1 |  	       7|	|R3 |  	       8|
+	+---+-----------+	+---+-----------+	+---+-----------+	+---+-----------+
+	| rozmiar: 16B	|	| rozmiar: 32B	|	| rozmiar: 64B	|	| rozmiar: 128B	|
+	+---------------+	+---------------+	+---------------+	+---------------+
+
+#REJESTRY
+
+	rejestr_R1  -  intiger "int"  -  8 bitów
+	
+	rejestr_R2  -  float/minus int  -  8 bitów
+	
+	rejestr_R3  -  word/słowa  -  8 bitów
+	
+	rejestr_R4  -  ---
+
+	rejestr_R5  -  syscall  -  8 bitów
+
+	rejestr_R10-16  -  ogólnego przeznaczenia - 8 bitów

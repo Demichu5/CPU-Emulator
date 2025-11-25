@@ -173,7 +173,45 @@ Skok jeśli flaga CARRY = 0.
 ### `jmp_n <adres>` – 36
 Skok jeśli flaga NEG = 0.
 
-### `cmp <ra> <rb>` – 37 / 38
+### `cmp_a <rejestr>` – 37
+Ustawia rejstr cmp **a** i zapamiętuje rejestr docelowy.
+
+### `cmp_b <rejestr>` - 38
+Ustawia rejestr **b** i wykonuje `porównanie`, zapisując wynik do rejestru flag.
+
+Przykład: (zero flag)
+```
+set r1
+mov 13
+set r2
+mov 13
+cmp_a r1
+cmp_b r2
+# wynik: "flag: zero = 1"
+```
+
+Przykład: (carry flag)
+```
+set r1
+mov 13
+set r2
+mov 12
+cmp_a r1
+cmp_b r2
+# wynik: "flag: carry = 1"
+```
+
+Przykład: (neg flag)
+```
+set r1
+mov 12
+set r2
+mov 13
+cmp_a r1
+cmp_b r2
+# wynik: "flag: neg = 1"
+```
+
 Porównuje dwa rejestry i ustawia flagi:
 - ZERO
 - CARRY
@@ -196,7 +234,7 @@ Zdejmuje `pc` ze stosu.
 Zatrzymuje CPU.
 
 ### `nop` – 255
-Nie robi nic.
+Nie robi nic. No operation.
 
 ---
 

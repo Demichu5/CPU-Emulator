@@ -165,13 +165,13 @@ jmp 40
 ```
 
 ### `jmp_z <adres>` – 34
-Skok jeśli flaga ZERO = 1.
+Skok jeśli flaga ZERO = 0.
 
 ### `jmp_c <adres>` – 35
-Skok jeśli flaga CARRY = 1.
+Skok jeśli flaga CARRY = 0.
 
 ### `jmp_n <adres>` – 36
-Skok jeśli flaga NEG = 1.
+Skok jeśli flaga NEG = 0.
 
 ### `cmp_a <rejestr>` – 37
 Ustawia rejstr cmp **a** i zapamiętuje rejestr docelowy.

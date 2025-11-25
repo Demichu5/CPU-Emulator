@@ -174,7 +174,7 @@ Skok jeśli flaga CARRY = 0.
 Skok jeśli flaga NEG = 0.
 
 ### `cmp_a <rejestr>` – 37
-Ustawia rejstr cmp **a** i zapamiętuje rejestr docelowy.
+Ustawia rejstr cmp **a**.
 
 ### `cmp_b <rejestr>` - 38
 Ustawia rejestr **b** i wykonuje `porównanie`, zapisując wynik do rejestru flag.

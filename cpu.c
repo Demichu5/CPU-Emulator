@@ -240,6 +240,10 @@ void fetch(CPU *core, uint8_t *opcode, uint8_t *argument){
 
         /*0010-0100 INC*/
         case 0x24:
+            if(*argument == ARG_PTR){
+                core->PTR.word++;
+                break;
+            }
             core->registers[*argument & 0x0F]++;
             if(core->registers[*argument & 0x0F] == 0){
                 core->flags[FLAG_ZERO] = 0x01;
@@ -250,6 +254,10 @@ void fetch(CPU *core, uint8_t *opcode, uint8_t *argument){
 
         /*0010-0101 DEC*/
         case 0x25:
+            if(*argument == ARG_PTR){
+                core->PTR.word--;
+                break;
+            }
             core->registers[*argument & 0x0F]--;
             if(core->registers[*argument & 0x0F] == 0){
                 core->flags[FLAG_ZERO] = 0x01;

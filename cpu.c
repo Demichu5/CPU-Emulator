@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "filehandler.h"
+
 #define PUSH        1
 #define POP         2
 #define Peek8Low    3
@@ -543,44 +545,25 @@ void fetch(CPU *core, uint8_t *opcode, uint8_t *argument){
 }
 
 void nicePrint(CPU *cpu, uint8_t *operation, uint8_t *argument, uint8_t debug){
-    printf("\033[2J");
+    //printf("\033[2J");
     printf("===============================================\n");
     printf("PC:%04X   | OP:%02X %02X   | PTR:%04X |\n", cpu->PC.word, *operation, *argument, cpu->PTR.word);
     printf("FN:%02X     | LP:%02X      | RG:%02X    |\n", cpu->FNStackPTR, cpu->LPStackPTR, cpu->RGStackPTR);
     printf("R0:%02X     | R1:%02X      | R2:%02X    | R3:%02X\n", cpu->registers[0], cpu->registers[1], cpu->registers[2], cpu->registers[3]);
     printf("F_ZERO:%02X | F_CARRY:%02X | F_NEG:%02X | ACT_REG: %02X\n", cpu->flags[FLAG_ZERO], cpu->flags[FLAG_CARRY], cpu->flags[FLAG_NEG], cpu->activeRegister);
     if(debug == 1){
-        // 1 == -self
         getchar();
     }
 }
 
 int main(int argc, char *argv[]){
-    // TO DO ARGV
-    /*<./program <binFile> <command + argument> e.g. ./cpu file.bin -clock 0.5*/
-    /*
-        -debug <counter integer> - debug terminal (pc % counter == 0) default 4
-        -clock <seconds double> - set custom clock
-        -self - wait for enter
-    */
 
-
-    ramSpace[0] = 0x11;    ramSpace[1] = 0x01;    // set r1
-    ramSpace[2] = 0x12;    ramSpace[3] = 0x05;    // mov 5
-
-    ramSpace[4] = 0x31;    ramSpace[5] = 0x00;    // setloop
-    ramSpace[6] = 0x25;    ramSpace[7] = 0x01;    // dec r1
-    ramSpace[8] = 0x34;    ramSpace[9] = 0x81;    // jmp_z loop
-    ramSpace[10] = 0x32;   ramSpace[11] = 0x00;   // endloop
-
-    ramSpace[12] = 0x11;   ramSpace[13] = 0x01;   // set r1
-    ramSpace[14] = 0x12;   ramSpace[15] = 0x05;   // mov 5
-    ramSpace[16] = 0x31;   ramSpace[17] = 0x00;   // setLoop
-    ramSpace[18] = 0x25;   ramSpace[19] = 0x01;   // dec r1
-    ramSpace[20] = 0x34;   ramSpace[21] = 0x81;   // jmp_z loop
-    ramSpace[22] = 0x32;   ramSpace[23] = 0x00;   // endLoop
-
-    ramSpace[24] = 0x00;   ramSpace[25] = 0x00;   // halt
+    if(argc == 2){
+        loadFile(argv[1], ramSpace, RAM_SIZE-1);
+    } else {
+        printf("Try: ./program <bin file>\n");
+        return 1;
+    }
 
     CPU cpuCore;
     memset(&cpuCore, 0, sizeof(CPU));

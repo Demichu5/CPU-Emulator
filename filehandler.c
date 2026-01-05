@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdio.h>
+#include "filehandler.h"
 
 void saveFile(const char *fileName, uint8_t *data, size_t size){
     FILE *filePTR;

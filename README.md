@@ -3,11 +3,12 @@
 Demichu5 CPU Architecure - Reference Manual
 Wersja 1.0 (Rev. 2026) Architektura 8-Bit
 
+```
 Przetestowany GCC/TCC
 tcc cpu.c filehandler.c -o main
 python3 compiler.py <program.asm>
 ./main <program.bin>
-
+```
 ---
 
 Spis treści

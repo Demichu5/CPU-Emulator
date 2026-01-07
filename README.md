@@ -74,34 +74,34 @@ Legenda:
 ```
 3.1 Przesyl Danych
 	Mnemonik	Opcode		Operand		Opis Dzialania
-	set		0x11		rD		wybiera rD jako aktywny rejestr dla operacji mov
-	mov		0x12		imm8		act = imm8
-	cpy		0x13		rD rS		rD = rS
-	ptr		0x14		rH rL		PTR_High = rH, PTR_Low = rL
+	set			0x11		rD			wybiera rD jako aktywny rejestr dla operacji mov
+	mov			0x12		imm8		act = imm8
+	cpy			0x13		rD rS		rD = rS
+	ptr			0x14		rH rL		PTR_High = rH, PTR_Low = rL
 	ptrh		0x15		imm8		PTR_High = imm8
 	ptrl		0x16		imm8		PTR_Low	= imm8
-	load		0x17		rD		rD = MEM[PTR]
-	store		0x18		rS		MEM[PTR] = rS
-	push		0x19		rS		STACK[SP++] = rS
-	pop		0x1A		rD		rD = STACK[--SP]
+	load		0x17		rD			rD = MEM[PTR]
+	store		0x18		rS			MEM[PTR] = rS
+	push		0x19		rS			STACK[SP++] = rS
+	pop			0x1A		rD			rD = STACK[--SP]
 
 3.2 Arytmeryka i Logika (ALU)
 	Mnemonik	Opcode		Operand		Flagi		Opis Dzialania
-	add		0x21		rD rS		Z, C		rD = rD + rS
-	sub		0x22		rD rS		Z, N		rD = rD - rS
-	cmp		0x23		rD rS		Z, N, C		wykonuje rD - rS, aktualizuje flagi, nie zmienia rD
-	inc		0x24		rD		Z		rD = rD + 1
-	dec		0x25		rD		Z		rD = rD - 1
+	add			0x21		rD rS		Z, C		rD = rD + rS
+	sub			0x22		rD rS		Z, N		rD = rD - rS
+	cmp			0x23		rD rS		Z, N, C		wykonuje rD - rS, aktualizuje flagi, nie zmienia rD
+	inc			0x24		rD			Z			rD = rD + 1
+	dec			0x25		rD			Z			rD = rD - 1
 
 3.3 Sterowanie Przeplywem
 	Mnemonik	Opcode		Operand		Warunek Skoku		Opis Dzialania
-	jmp		0x33		Label		-			Skok bezwarunkowy, PC = Label
-	jmp_z		0x34		Label		Z == 0			Skocz jeśli NIE ZERO (wynik != 0)
-	jmp_c		0x35		Label		C == 0			Skocz jeśli BRAK PRZENIESIENIA
-	jmp_n		0x36		Label		N == 0			Skocz jeśli DODATNI (wynik >= 0)
-	call		0x37		Label		-			STACK[SP++] = PC, PC = Label
-	ret		0x38		-		-			PC = STACK[--SP]
-	halt		0x00		-		-			Zatrzymuje zegar procesora
+	jmp			0x33		Label		-					Skok bezwarunkowy, PC = Label
+	jmp_z		0x34		Label		Z == 0				Skocz jeśli NIE ZERO (wynik != 0)
+	jmp_c		0x35		Label		C == 0				Skocz jeśli BRAK PRZENIESIENIA
+	jmp_n		0x36		Label		N == 0				Skocz jeśli DODATNI (wynik >= 0)
+	call		0x37		Label		-					STACK[SP++] = PC, PC = Label
+	ret			0x38		-			-					PC = STACK[--SP]
+	halt		0x00		-			-					Zatrzymuje zegar procesora
 ```
 
 # 4. Dyrektywy Assemblera

@@ -12,6 +12,7 @@ python3 compiler.py <program.asm>
 ---
 
 Spis treści
+```
 1: Model Programowy:
 	1.1 Organizacja pamięci
 	1.2 Rejestry ogolnego przeznaczenia
@@ -30,7 +31,7 @@ Spis treści
 4: Dyrektywny Assemblera
 
 5: Przykladowy program (Bubble Sort)
-
+```
 ---
 
 # 1. Model Programowy

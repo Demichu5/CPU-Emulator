@@ -568,9 +568,12 @@ void nicePrint(CPU *cpu, uint8_t *operation, uint8_t *argument, uint8_t debug){
     printf("R12:%02X    | R13:%02X     | R14:%02X   | R15:%02X\n", cpu->registers[12], cpu->registers[13], cpu->registers[14], cpu->registers[15]);
     printf("F_ZERO:%02X | F_CARRY:%02X | F_NEG:%02X | ACT_REG: %02X\n", cpu->flags[FLAG_ZERO], cpu->flags[FLAG_CARRY], cpu->flags[FLAG_NEG], cpu->activeRegister);
     printf("\n");
-    for(uint8_t i=0x0050;i<0xA0;i++){
+    for(uint16_t i=0x0000;i<0xFFFF;i++){
         if(i % 8 == 0){
             printf("%04X: %02X %02X %02X %02X %02X %02X %02X %02X\n", i, ramSpace[i],ramSpace[i+1],ramSpace[i+2],ramSpace[i+3],ramSpace[i+4],ramSpace[i+5],ramSpace[i+6],ramSpace[i+7]);
+            if(ramSpace[i] == 0x00){
+                break;
+            }
         }
     }
     if(debug == 1){

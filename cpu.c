@@ -19,6 +19,11 @@
 #define ARG_LOOP    0x81
 #define ARG_PTR     0x82
 
+#define TERMINAL_SCREEN_ADDR    0xFA00
+#define TERMINAL_SCREEN_HEIGHT  30
+#define TERMINAL_SCREEN_WIDTH   40
+
+
 #define HIGH_NIBBLE(byte)   (((byte) >> 4) & 0x0F)
 #define LOW_NIBBLE(byte)    ((byte) & 0x0F)
 #define ARGUMENT_DEST(byte) HIGH_NIBBLE(byte)
@@ -394,7 +399,7 @@ void fetch(CPU *core, uint8_t *opcode, uint8_t *argument){
                 }
                 //ARG PTR
                 if(*argument == ARG_PTR){
-                    core->PC.word = core->PTR.word;
+                    core->PC.word = core->PTR.word - 2;
                     break;
                 }
                 break;
@@ -433,7 +438,7 @@ void fetch(CPU *core, uint8_t *opcode, uint8_t *argument){
                 }
                 //ARG PTR
                 if(*argument == ARG_PTR){
-                    core->PC.word = core->PTR.word;
+                    core->PC.word = core->PTR.word - 2;
                     break;
                 }
                 break;
@@ -472,7 +477,7 @@ void fetch(CPU *core, uint8_t *opcode, uint8_t *argument){
                 }
                 //ARG PTR
                 if(*argument == ARG_PTR){
-                    core->PC.word = core->PTR.word;
+                    core->PC.word = core->PTR.word - 2;
                     break;
                 }
                 break;
@@ -558,7 +563,16 @@ void nicePrint(CPU *cpu, uint8_t *operation, uint8_t *argument, uint8_t debug){
     printf("PC:%04X   | OP:%02X %02X   | PTR:%04X |\n", cpu->PC.word, *operation, *argument, cpu->PTR.word);
     printf("FN:%02X     | LP:%02X      | RG:%02X    |\n", cpu->FNStackPTR, cpu->LPStackPTR, cpu->RGStackPTR);
     printf("R0:%02X     | R1:%02X      | R2:%02X    | R3:%02X\n", cpu->registers[0], cpu->registers[1], cpu->registers[2], cpu->registers[3]);
+    printf("R4:%02X     | R5:%02X      | R6:%02X    | R7:%02X\n", cpu->registers[4], cpu->registers[5], cpu->registers[6], cpu->registers[7]);
+    printf("R8:%02X     | R9:%02X      | R10:%02X   | R11:%02X\n", cpu->registers[8], cpu->registers[9], cpu->registers[10], cpu->registers[11]);
+    printf("R12:%02X    | R13:%02X     | R14:%02X   | R15:%02X\n", cpu->registers[12], cpu->registers[13], cpu->registers[14], cpu->registers[15]);
     printf("F_ZERO:%02X | F_CARRY:%02X | F_NEG:%02X | ACT_REG: %02X\n", cpu->flags[FLAG_ZERO], cpu->flags[FLAG_CARRY], cpu->flags[FLAG_NEG], cpu->activeRegister);
+    printf("\n");
+    for(uint8_t i=0x0050;i<0xA0;i++){
+        if(i % 8 == 0){
+            printf("%04X: %02X %02X %02X %02X %02X %02X %02X %02X\n", i, ramSpace[i],ramSpace[i+1],ramSpace[i+2],ramSpace[i+3],ramSpace[i+4],ramSpace[i+5],ramSpace[i+6],ramSpace[i+7]);
+        }
+    }
     if(debug == 1){
         getchar();
     }
@@ -578,11 +592,12 @@ int main(int argc, char *argv[]){
     cpuCore.running = 1;
 
     while(cpuCore.running == 1){
-        if(cpuCore.PC.word % 4 == 0){
-            nicePrint(&cpuCore, &ramSpace[cpuCore.PC.word], &ramSpace[cpuCore.PC.word + 1], 0);
+        if(cpuCore.PC.word % 2 == 0){
+            //nicePrint(&cpuCore, &ramSpace[cpuCore.PC.word], &ramSpace[cpuCore.PC.word + 1], 0);
         }
         fetch(&cpuCore, &ramSpace[cpuCore.PC.word], &ramSpace[cpuCore.PC.word + 1]);
         cpuCore.PC.word = cpuCore.PC.word + 2;
     }
+    nicePrint(&cpuCore, &ramSpace[cpuCore.PC.word], &ramSpace[cpuCore.PC.word + 1], 0);
     return 0;
 }

@@ -31,6 +31,8 @@ Spis treści
 4: Dyrektywny Assemblera
 
 5: Przykladowy program (Bubble Sort)
+
+6. Licencjonowanie Komercyjne
 ```
 ---
 

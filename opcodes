@@ -1,0 +1,45 @@
+set 0x11 - aktywny rejestr (set r1)
+mov 0x12 - zaladuj liczbe bezposrednio do aktywnego rejestru (mov 16)
+cpy 0x13 - kopiuje z aktywnego rejestru do docelowego (cpy r1 r2)
+ptr 0x14 - laczy dwa rejestry w jeden (ptr r1(low) r2(high))
+ptrH 0x15 - laduje licze bezposrednio do ptr high (ptrH 20)
+ptrL 0x16 - laduje liczbe bezposrednio do ptr low (ptr 30)
+load 0x17 - Pobiera bajt z adresu pamieci do aktywnego rejestru (load ptr)
+store 0x18 - Zapisuje aktywny rejestr do pameci ram (store ptr)
+push 0x19 - zapisz zawartosc rejestru na stos (push r1)
+pop 0x1A - wpisz wartosc do rejestru z stosu (pop r1)
+
+add 0x21 - dodaj zawartosc i zapisz w pierwszym agrumencie (add r1 r2)
+sub 0x22 - odejmij zawartosc i zapisz w pierwszym agrumencie (sub r1 r2)
+cmp 0x23 - porownaj rejestry i ustaw flage (cmp r1 r2)
+inc 0x24 - zwieksz wartosc o 1 (inc r1)
+dec 0x25 - zmiejsz wartosc o 1 (dec r1)
+
+
+setloop 0x31 - ustawia punkt adresu na stosie loop i zwieksza wskaznik o 2 (setloop)
+loop 0x81 - nazwa punktu odniesienia jako argument, zmiejsza wkasnik o 2 i oddaje zawartosc w agrumencie
+endloop 0x32 - usuwa sp
+jmp 0x33 - skocz bezwarunkowo do adresu (jmp ptr/loop)
+jmp_z 0x34 - skocz do adresu jesli flaga zero = 1 (jmp_z ptr/loop)
+jmp_c 0x35 - skocz do adresu jesli flaga carry = 1 (jmp_c ptr/loop)
+jmp_n 0x36 - skocz do adresu jesli flaga neg = 1 (jmp_n ptr/loop)
+
+
+call 0x37 - skocz do adresu i zapisz adres na stosie, zwieksz wskaznik o 1 (call ptr)
+ret 0x38 - zmiejsz wskaznik o jeden i skocz do adresu (ret)
+halt 0x00
+
+
+ARGUMENTY/ETYKIETY:
+PTR - 0x82
+LOOP - 0x81
+
+REJESTRY:
+R0 - R15
+activeRegister
+
+Flagi:
+carry
+zero
+negative
+

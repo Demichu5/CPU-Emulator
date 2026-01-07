@@ -65,15 +65,14 @@ def firstPhase():
         if(token == ".data"): _inCodeSection = False; i += 1
         elif(token == ".code"): _inCodeSection = True; i += 1
         
-        # NOWOŚĆ: Wykrywanie etykiet (np. "ETYKIETA:")
+        # Wykrywanie etykiet (np. "ETYKIETA:")
         elif token.endswith(":"):
             label_name = token[:-1] # Usuń dwukropek
             LABEL_STACK[label_name] = _pc
-            # Etykieta nie zajmuje miejsca w pamięci, więc nie zwiększamy _pc
             i += 1
             continue
 
-        # Zmienne
+        # Zmienne (Poprawiona logika)
         elif(token == "var"):
             raw_name = tokens[i+1]; var_size = 1
             if "[" in raw_name and "]" in raw_name:
@@ -83,13 +82,19 @@ def firstPhase():
             
             init_bytes = [0] * var_size
             scan_offset = 2 
+            
+            # Sprawdzamy wartość inicjalizującą
             if i + scan_offset < len(tokens):
                 first_val_token = tokens[i + scan_offset]
+                
+                # A. Napis "Tekst"
                 if first_val_token.startswith('"'):
                     clean_str = first_val_token.replace('"', '')
                     for idx, char in enumerate(clean_str):
                         if idx < var_size: init_bytes[idx] = ord(char)
                     scan_offset += 1
+                
+                # B. Tablica {1 2 3}
                 elif "{" in first_val_token:
                     bytes_filled = 0
                     while True:
@@ -103,6 +108,17 @@ def firstPhase():
                             except: pass
                         scan_offset += 1
                         if "}" in curr_token: break
+                
+                # C. Zwykła liczba (var x 10) - NOWOŚĆ
+                else:
+                    try:
+                        val = int(first_val_token)
+                        if var_size > 0: init_bytes[0] = val & 0xFF
+                        scan_offset += 1
+                    except:
+                        # To nie jest wartość (np. komentarz lub kolejna instrukcja)
+                        pass
+
             VAR_DATA_LIST.append((raw_name, var_size, init_bytes))
             i += scan_offset
         
@@ -111,28 +127,42 @@ def firstPhase():
             FN_STACK[tokens[i+1]] = _pc
             i += 2
         
+        # --- SYMULACJA ROZMIARU INSTRUKCJI ---
         else:
             if(not _inCodeSection): i += 1; continue
 
-            # Symulacja rozmiaru instrukcji
+            # call -> ptrL + ptrH + call ptr = 6 bajtów
             if(token == "call"): _pc += 6; i += 2
+            
+            # Skoki -> ptrL + ptrH + jmp ptr (6 bajtów) LUB jmp ptr (2 bajty)
             elif(token in ["jmp", "jmp_z", "jmp_c", "jmp_n"]):
                 target_name = tokens[i+1]
                 if target_name.upper() in ["LOOP", "PTR"]: _pc += 2
                 else: _pc += 6
                 i += 2
+            
+            # load/store -> ptrL + ptrH + load r1 (6 bajtów) LUB load r1 PTR (2 bajty)
             elif(token in ["store", "load"]):
                 target_name = tokens[i+2]
                 if target_name.upper() == "PTR": _pc += 2
                 else: _pc += 6
                 i += 3
-            elif(token in ["add", "sub", "cmp", "ptr", "cpy"]): _pc += 2; i += 3
-            elif(token in ["set", "mov", "ptrH", "ptrL", "push", "pop", "inc", "dec"]): _pc += 2; i += 2
+            
+            # PTR -> ptrL + ptrH (4 bajty) LUB ptr r1 r2 (2 bajty) - NOWOŚĆ
+            elif(token == "ptr"):
+                arg1 = tokens[i+1]
+                if arg1 in REJESTRY: _pc += 2; i += 3 # Sprzętowe
+                else: _pc += 4; i += 2                # Pseudo-instrukcja (zmienna)
+
+            # Reszta instrukcji (UWAGA: usunąłem 'ptr' z listy poniżej)
+            elif(token in ["add", "sub", "cmp", "cpy"]): _pc += 2; i += 3
+            elif(token in ["set", "mov", "ldi", "ptrH", "ptrL", "push", "pop", "inc", "dec"]): _pc += 2; i += 2
             elif(token in ["halt", "ret", "setloop", "endloop"]): _pc += 2; i += 1
             else: i += 1
             
     return _pc
 
+# --- FAZA 2: Generowanie kodu ---
 # --- FAZA 2: Generowanie kodu ---
 def secondPhase():
     binary = []
@@ -147,7 +177,6 @@ def secondPhase():
         if token.endswith(":"): i += 1; continue # Ignoruj etykiety w 2. fazie
 
         if(token == "var"): # Pomiń var i jego argumenty
-            # (Ta sama logika pomijania co w firstPhase, w skrócie)
             scan_offset = 2
             if i+2 < len(tokens):
                 nxt = tokens[i+2]
@@ -161,18 +190,25 @@ def secondPhase():
         if not _inCodeSection: i += 1; continue
 
         # --- INSTRUKCJE ---
+        
+        # 1. CALL (Automatyczne ładowanie adresu do PTR)
         if token == "call":
             target_name = tokens[i+1]; address = parse_arg(target_name)
             binary.extend([OPCODELIST["ptrL"], address & 0xFF, OPCODELIST["ptrH"], (address >> 8) & 0xFF, OPCODELIST["call"], OPCODELIST["PTR"]])
             i += 2
+            
+        # 2. SKOKI (JMP, JMP_Z...)
         elif token in ["jmp", "jmp_z", "jmp_c", "jmp_n"]:
             target_name = tokens[i+1]
             if target_name.upper() in ["LOOP", "PTR"]:
                  binary.extend([OPCODELIST[token], parse_arg(target_name)])
             else:
+                # Pseudo-instrukcja: Załaduj etykietę do PTR, potem skocz do PTR
                 address = parse_arg(target_name)
                 binary.extend([OPCODELIST["ptrL"], address & 0xFF, OPCODELIST["ptrH"], (address >> 8) & 0xFF, OPCODELIST[token], OPCODELIST["PTR"]])
             i += 2
+            
+        # 3. STORE / LOAD (Pamięć)
         elif token in ["store", "load"]:
             reg_name = tokens[i+1]; target_name = tokens[i+2]
             if target_name.upper() == "PTR": binary.extend([OPCODELIST[token], parse_arg(reg_name)])
@@ -180,12 +216,33 @@ def secondPhase():
                 address = parse_arg(target_name)
                 binary.extend([OPCODELIST["ptrL"], address & 0xFF, OPCODELIST["ptrH"], (address >> 8) & 0xFF, OPCODELIST[token], parse_arg(reg_name)])
             i += 3
-        elif token in ["add", "sub", "cmp", "ptr", "cpy"]:
+
+        # 4. PTR (To jest ta zmiana!)
+        elif token == "ptr":
+            arg1_str = tokens[i+1]
+            # Sprawdź czy to rejestr (ptr r1 r2) czy Zmienna (ptr NAZWA)
+            if arg1_str in REJESTRY:
+                # Klasyczne: ptr rH rL
+                binary.extend([OPCODELIST["ptr"], (parse_arg(tokens[i+1]) << 4) | parse_arg(tokens[i+2])])
+                i += 3
+            else:
+                # Pseudo: ptr ZMIENNA -> ptrL low, ptrH high
+                address = parse_arg(arg1_str)
+                binary.extend([OPCODELIST["ptrL"], address & 0xFF, OPCODELIST["ptrH"], (address >> 8) & 0xFF])
+                i += 2
+
+        # 5. Arytmetyka (UWAGA: usunąłem stąd "ptr")
+        elif token in ["add", "sub", "cmp", "cpy"]:
             binary.extend([OPCODELIST[token], (parse_arg(tokens[i+1]) << 4) | parse_arg(tokens[i+2])]); i += 3
+            
+        # 6. Reszta (1 argument)
         elif token in ["set", "mov", "ptrH", "ptrL", "push", "pop", "inc", "dec"]:
             binary.extend([OPCODELIST[token], parse_arg(tokens[i+1])]); i += 2
+            
+        # 7. Bez argumentów
         elif token in ["halt", "ret", "setloop", "endloop"]:
             binary.extend([OPCODELIST[token], 0x00]); i += 1
+            
         else: i += 1
 
     return binary

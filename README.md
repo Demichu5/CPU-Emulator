@@ -240,3 +240,13 @@ NASTEPNY_PRZEBIEG_GLOWNY:
 KONIEC_PROGRAMU:
     halt
 ```
+
+6. Licencja
+```
+Copyright (C) 2025 Demichu5
+
+Ten projekt jest oprogramowaniem wolnym: możesz go rozpowszechniać i/lub modyfikować zgodnie z warunkami Powszechnej Licencji Publicznej GNU (GPL) opublikowanej przez Free Software Foundation, w wersji 3 tej Licencji lub (według Twojego wyboru) którejkolwiek z późniejszych wersji.
+Licencjonowanie Komercyjne
+
+Jeśli chcesz wykorzystać ten projekt w produkcie zamkniętym (proprietary) lub nie możesz spełnić warunków licencji GPLv3, dostępna jest licencja komercyjna. Proszę o kontakt w celu ustalenia warunków.
+```

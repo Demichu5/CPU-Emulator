@@ -1,149 +1,102 @@
-# Emulator CPU – README
+# CPU Emulator – README
 
-Demichu5 CPU Architecure - Reference Manual
-Wersja 1.0 (Rev. 2026) Architektura 8-Bit
+Demichu5 CPU Architecture - Reference Manual
+Version 1.0 (Rev. 2026) 8-Bit Architecture
 
-```
-Przetestowany GCC/TCC
+Tested with GCC/TCC
 tcc cpu.c filehandler.c -o main
-python3 compiler.py <program.asm>
-./main <program.bin>
-```
+python3 compiler.py &lt;program.asm&gt;
+./main &lt;program.bin&gt;
+
 ---
 
-Spis treści
-```
-1: Model Programowy:
-	1.1 Organizacja pamięci
-	1.2 Rejestry ogolnego przeznaczenia
-	1.3 Rejestry Specjalne i wskaznikowe
-	1.4 Rejestr stanu
+### Table of Contents
+1. Programming Model
+2. Instruction Format
+3. Instruction Set Architecture (ISA)
+4. Assembler Directives
+5. Example Program (Bubble Sort)
+6. Licensing
 
-2: Format Instrukcji
-	2.1 Kodowanie instrukcji
-	2.2 Tryby adresowania
-
-3: Zestaw Instrukcji (ISA)
-	3.1 Przesyl danych
-	3.2 Arytmeryka i logika
-	3.3 Sterowanie przepływem
-
-4: Dyrektywny Assemblera
-
-5: Przykladowy program (Bubble Sort)
-
-6. Licencjonowanie Komercyjne
-```
 ---
 
-# 1. Model Programowy
-```
-1.1 Organizacja pamięci
-	Procesor operuje na przestrzeni adresowej o rozmiarze 64 KB (65 536 Bajtow)
-	Architektura typu Von Neumann - Kod programu i dane wyspoldziela te sama przesten adresowa
-	*Slowo danych: 8 Bitow (1 Bajt)
-	*Szyna adresowa: 16 Bitow (2 Bajty)
-	*Kolejnosc bajtow: Little-Endian
+# 1. Programming Model
+1.1 Memory Organization
+    * Address Space: 64 KB (65,536 Bytes)
+    * Architecture: Von Neumann (shared code and data space)
+    * Data Word: 8 Bits (1 Byte)
+    * Address Bus: 16 Bits (2 Bytes)
+    * Byte Order: Little-Endian
 
-1.2 Rejestry ogolnego przeznaczenia
-	Procesor udostepnia 16 rejestrow 8-bitowych dostępnych dla programisty
-	R0 - R15 : Sluza do przechowywania danych tymczasowych, argumentow arytmerycznych i licznikow petli
+1.2 General Purpose Registers
+    * R0 - R15: 16 8-bit registers for temporary data and counters.
 
-1.3 Rejestry specjalne i wskaźnikowe
-	PC : 16-bit (2 Bajty) : Program Counter wskazuje adres następnej instrukcji do wykonania, inkrementowany automatyczne (+2) po każdym cyklu fetch
-	PTR : 16-bit (2 Bajty) : Pointer Register sluzy do adresowania używanych operacji load/store. Sklada się z dwóch części 8-bitowych (High/Low)
+1.3 Special and Pointer Registers
+    * PC: 16-bit Program Counter (auto-increment +2).
+    * PTR: 16-bit Pointer Register (High/Low) for load/store operations.
 
-1.4 Rejestr Stanu
-	Flagi sa aktualizowane automatycznie po operacjach arytmerycznych (ADD, SUB, INC, DEC) oraz porównania (CMP)
-	Flaga Z : ZERO : Ustawiona (1), gdy wynik operacji wynosi 0
-	Flaga C : CARRY : Ustawiona (1), gdy nastapilo przepełnienie (wynik > 255)
-	Flaga N : NEGATIVE : Ustawiona (1), gdy wynik jest ujemny
-```
+1.4 Status Register
+    * Z Flag (ZERO): Set if result is 0.
+    * C Flag (CARRY): Set if result > 255.
+    * N Flag (NEGATIVE): Set if result is negative.
 
-# 2. Format Instrukcji
-```
-Wszystkie instrukcje maja stala dlugosc 2 Bajtow (16 bitow)
-2.1 Kodowanie instukcji
-	[ 8 bitow : OPCODE ] [ 8 bitow : ARGUMENT ]
-	Sposób interpretacji pola ARGUMENT zależy od instrukcji:
-		1: Immediate: Cale 8 Bitow to liczba (np. mov 10)
-		2: Register: Mlodsze 4 bit to indeks rejestru (np. set r1)
-		3: Register-Register: Dwa rejestry spakowane w jeden bajt (High Nibble = Dest, Low Nibble = Src) (np. add r1 r2)
-```
+---
 
-# 3. Zestaw Instrukcji (ISA)
-```
-Legenda:
-	act : Aktywny rejestr (wybierany instrukcja set)
-	rD : Rejestr docelowy
-	rS : Rejestr zrodlowy
-	imm8 : Wartosc natychmiastowa 8-Bit
-	[PTR] : Wartosc w pamięci pod adresem wskaznywanym przez rejestr PTR
-```
-```
-3.1 Przesyl Danych
-	Mnemonik	Opcode		Operand		Opis Dzialania
-	set			0x11		rD			wybiera rD jako aktywny rejestr dla operacji mov
-	mov			0x12		imm8		act = imm8
-	cpy			0x13		rD rS		rD = rS
-	ptr			0x14		rH rL		PTR_High = rH, PTR_Low = rL
-	ptrh		0x15		imm8		PTR_High = imm8
-	ptrl		0x16		imm8		PTR_Low	= imm8
-	load		0x17		rD			rD = MEM[PTR]
-	store		0x18		rS			MEM[PTR] = rS
-	push		0x19		rS			STACK[SP++] = rS
-	pop			0x1A		rD			rD = STACK[--SP]
+# 2. Instruction Format
+Length: 2 Bytes (16 bits).
+Encoding: [ 8 bits : OPCODE ] [ 8 bits : ARGUMENT ]
+Argument types: Immediate, Register (4 bits), or Register-Register (nibbles).
 
-3.2 Arytmeryka i Logika (ALU)
-	Mnemonik	Opcode		Operand		Flagi		Opis Dzialania
-	add			0x21		rD rS		Z, C		rD = rD + rS
-	sub			0x22		rD rS		Z, N		rD = rD - rS
-	cmp			0x23		rD rS		Z, N, C		wykonuje rD - rS, aktualizuje flagi, nie zmienia rD
-	inc			0x24		rD			Z			rD = rD + 1
-	dec			0x25		rD			Z			rD = rD - 1
+---
 
-3.3 Sterowanie Przeplywem
-	Mnemonik	Opcode		Operand		Warunek Skoku		Opis Dzialania
-	jmp			0x33		Label		-					Skok bezwarunkowy, PC = Label
-	jmp_z		0x34		Label		Z == 0				Skocz jeśli NIE ZERO (wynik != 0)
-	jmp_c		0x35		Label		C == 0				Skocz jeśli BRAK PRZENIESIENIA
-	jmp_n		0x36		Label		N == 0				Skocz jeśli DODATNI (wynik >= 0)
-	call		0x37		Label		-					STACK[SP++] = PC, PC = Label
-	ret			0x38		-			-					PC = STACK[--SP]
-	halt		0x00		-			-					Zatrzymuje zegar procesora
-```
+# 3. Instruction Set Architecture (ISA)
 
-# 4. Dyrektywy Assemblera
-```
-	Kompilator obsluguje nastepujace sekcje i definicje danych
-	Sekcje:
-		.code - rozpoczyna sekcje intrukcji
-		.data - rozpoczyna sekcje definicji zmiennych (nie wykonywalna)
-	Deklaracja zmiennych (var)
-		; Skladnia: var <nazwa> <rozmiar_opcjonalny> <wartosc_opcjonalna>
-		var liczba			; Zmienna bez wartosci
-		var licznik 10			; Zmienna o wartości 10
-		
-		var buffor[10]			; Tablica o rozmiarze 10 wypelniona zerami
-		var tablica[5] {1 2 3 4 5}	; Tablica o rozmiarze 5 wypelniona danymi 1 2 3 4 5
-		var napis "Tekst"		; Tablica o rozmiarze N + 1, ciąg znakow + null terminator
+3.1 Data Transfer
+Mnemonic    Opcode      Operand     Description
+set         0x11        rD          Selects rD as active register for mov
+mov         0x12        imm8        act = imm8
+cpy         0x13        rD rS       rD = rS
+ptr         0x14        rH rL       PTR_High = rH, PTR_Low = rL
+ptrh        0x15        imm8        PTR_High = imm8
+ptrl        0x16        imm8        PTR_Low  = imm8
+load        0x17        rD          rD = MEM[PTR]
+store       0x18        rS          MEM[PTR] = rS
+push        0x19        rS          STACK[SP++] = rS
+pop         0x1A        rD          rD = STACK[--SP]
 
-	Etykiety i Funkcje
-	; Etykieta skoku
-	NAZWA:
-	
-	; Funkcje dla call
-	fn NAZWA_FUNKCJI
-```
+3.2 Arithmetic and Logic (ALU)
+Mnemonic    Opcode      Operand     Flags       Description
+add         0x21        rD rS       Z, C        rD = rD + rS
+sub         0x22        rD rS       Z, N        rD = rD - rS
+cmp         0x23        rD rS       Z, N, C     rD - rS (updates flags only)
+inc         0x24        rD          Z           rD = rD + 1
+dec         0x25        rD          Z           rD = rD - 1
 
-5. Przykalowy program (Bubble Sort)
-```
+3.3 Flow Control
+Mnemonic    Opcode      Operand     Condition       Description
+jmp         0x33        Label       -               Unconditional jump
+jmp_z       0x34        Label       Z == 0          Jump if NOT ZERO
+jmp_c       0x35        Label       C == 0          Jump if NO CARRY
+jmp_n       0x36        Label       N == 0          Jump if POSITIVE
+call        0x37        Label       -               STACK[SP++] = PC
+ret         0x38        -           -               PC = STACK[--SP]
+halt        0x00        -           -               Stops CPU clock
+
+---
+
+# 4. Assembler Directives
+* .code - instruction section
+* .data - variable section
+* var &lt;name&gt; &lt;size&gt; &lt;value&gt;
+    * var buffer[10] (array of 0s)
+    * var string "Text" (null-terminated)
+
+---
+
+# 5. Example Program (Bubble Sort)
 ; bubblesort.asm
-; Dane wejściowe: {5, 1, 4, 2, 8}
-; Oczekiwany wynik: {1, 2, 4, 5, 8}
-
 .data
-    var liczby[5] {5 1 4 2 8}
+    var numbers[5] {5 1 4 2 8}
 
 .code
 fn MAIN
@@ -151,63 +104,57 @@ fn MAIN
     mov 20
     set r0
     mov 0
-
     set r15
     mov 0
 
-PETLA_GLOWNA:
+MAIN_LOOP:
     cmp r5 r0
-    jmp_z ROZPOCZNIJ_PRZEBIEG
+    jmp_z START_PASS
     halt
 
-ROZPOCZNIJ_PRZEBIEG:
+START_PASS:
     set r10
-    mov liczby
-    
+    mov numbers
     set r11
-    mov liczby
+    mov numbers
     inc r11
-
     set r4
     mov 4
 
-PETLA_WEWNETRZNA:
+INNER_LOOP:
     cmp r4 r0
-    jmp_z SPRAWDZ_PARE
-    jmp NASTEPNY_PRZEBIEG_GLOWNY
+    jmp_z CHECK_PAIR
+    jmp NEXT_MAIN_PASS
 
-SPRAWDZ_PARE:
+CHECK_PAIR:
     ptr r15 r10
     load r1 PTR
     ptr r15 r11
     load r2 PTR
     cmp r1 r2
-    jmp_n ZROB_SWAP
-    jmp DALEJ
+    jmp_n DO_SWAP
+    jmp CONTINUE
 
-ZROB_SWAP:
+DO_SWAP:
     ptr r15 r11
     store r1 PTR
     ptr r15 r10
     store r2 PTR
 
-DALEJ:
+CONTINUE:
     inc r10
     inc r11
     dec r4
-    jmp PETLA_WEWNETRZNA
+    jmp INNER_LOOP
 
-NASTEPNY_PRZEBIEG_GLOWNY:
+NEXT_MAIN_PASS:
     dec r5
-    jmp PETLA_GLOWNA
-```
+    jmp MAIN_LOOP
 
-6. Licencja
-```
+---
+
+# 6. Licensing
 Copyright (C) 2025 Demichu5
+Licensed under GNU General Public License (GPL) version 3.
 
-Ten projekt jest oprogramowaniem wolnym: możesz go rozpowszechniać i/lub modyfikować zgodnie z warunkami Powszechnej Licencji Publicznej GNU (GPL) opublikowanej przez Free Software Foundation, w wersji 3 tej Licencji lub (według Twojego wyboru) którejkolwiek z późniejszych wersji.
-Licencjonowanie Komercyjne
-
-Jeśli chcesz wykorzystać ten projekt w produkcie zamkniętym (proprietary) lub nie możesz spełnić warunków licencji GPLv3, dostępna jest licencja komercyjna. Proszę o kontakt w celu ustalenia warunków.
-```
+Commercial Licensing: Available for proprietary products. Contact author for terms.

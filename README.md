@@ -1,5 +1,5 @@
 # CPU Emulator – README
-
+```
 Demichu5 CPU Architecture - Reference Manual
 Version 1.0 (Rev. 2026) 8-Bit Architecture
 
@@ -7,9 +7,9 @@ Tested with GCC/TCC
 tcc cpu.c filehandler.c -o main
 python3 compiler.py <program.asm>
 ./main <program.bin>
-
+```
 ---
-
+```
 ### Table of Contents
 1. Programming Model
 2. Instruction Format
@@ -17,9 +17,9 @@ python3 compiler.py <program.asm>
 4. Assembler Directives
 5. Example Program (Bubble Sort)
 6. Licensing
-
+```
 ---
-
+```
 # 1. Programming Model
 1.1 Memory Organization
     * Address Space: 64 KB (65,536 Bytes)
@@ -39,18 +39,18 @@ python3 compiler.py <program.asm>
     * Z Flag (ZERO): Set if result is 0.
     * C Flag (CARRY): Set if result > 255.
     * N Flag (NEGATIVE): Set if result is negative.
-
+```
 ---
-
+```
 # 2. Instruction Format
 Length: 2 Bytes (16 bits).
 Encoding: [ 8 bits : OPCODE ] [ 8 bits : ARGUMENT ]
 Argument types: Immediate, Register (4 bits), or Register-Register (nibbles).
-
+```
 ---
-
+```
 # 3. Instruction Set Architecture (ISA)
-
+```
 3.1 Data Transfer
 Mnemonic    Opcode      Operand     Description
 set         0x11        rD          Selects rD as active register for mov
@@ -81,18 +81,18 @@ jmp_n       0x36        Label       N == 0          Jump if POSITIVE
 call        0x37        Label       -               STACK[SP++] = PC
 ret         0x38        -           -               PC = STACK[--SP]
 halt        0x00        -           -               Stops CPU clock
-
+```
 ---
-
+```
 # 4. Assembler Directives
 * .code - instruction section
 * .data - variable section
 * var <name> <size> <value>
     * var buffer[10] (array of 0s)
     * var string "Text" (null-terminated)
-
+```
 ---
-
+```
 # 5. Example Program (Bubble Sort)
 ; bubblesort.asm
 .data
@@ -150,11 +150,13 @@ CONTINUE:
 NEXT_MAIN_PASS:
     dec r5
     jmp MAIN_LOOP
-
+```
 ---
-
+```
 # 6. Licensing
 Copyright (C) 2025 Demichu5
 Licensed under GNU General Public License (GPL) version 3.
 
 Commercial Licensing: Available for proprietary products. Contact author for terms.
+```
+---

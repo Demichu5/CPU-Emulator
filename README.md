@@ -63,7 +63,7 @@ load        0x17        rD          rD = MEM[PTR]
 store       0x18        rS          MEM[PTR] = rS
 push        0x19        rS          STACK[SP++] = rS
 pop         0x1A        rD          rD = STACK[--SP]
-
+```
 3.2 Arithmetic and Logic (ALU)
 Mnemonic    Opcode      Operand     Flags       Description
 add         0x21        rD rS       Z, C        rD = rD + rS
@@ -71,7 +71,7 @@ sub         0x22        rD rS       Z, N        rD = rD - rS
 cmp         0x23        rD rS       Z, N, C     rD - rS (updates flags only)
 inc         0x24        rD          Z           rD = rD + 1
 dec         0x25        rD          Z           rD = rD - 1
-
+```
 3.3 Flow Control
 Mnemonic    Opcode      Operand     Condition       Description
 jmp         0x33        Label       -               Unconditional jump

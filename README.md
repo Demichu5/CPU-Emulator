@@ -5,8 +5,8 @@ Version 1.0 (Rev. 2026) 8-Bit Architecture
 
 Tested with GCC/TCC
 tcc cpu.c filehandler.c -o main
-python3 compiler.py &lt;program.asm&gt;
-./main &lt;program.bin&gt;
+python3 compiler.py <program.asm>
+./main <program.bin>
 
 ---
 
@@ -87,7 +87,7 @@ halt        0x00        -           -               Stops CPU clock
 # 4. Assembler Directives
 * .code - instruction section
 * .data - variable section
-* var &lt;name&gt; &lt;size&gt; &lt;value&gt;
+* var <name> <size> <value>
     * var buffer[10] (array of 0s)
     * var string "Text" (null-terminated)
 

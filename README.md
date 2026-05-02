@@ -1,160 +1,139 @@
 # CPU Emulator – README
 
-Demichu5 CPU Architecture - Reference Manual
-Version 1.0 (Rev. 2026) 8-Bit Architecture
-
-Tested with GCC/TCC
-tcc cpu.c filehandler.c -o main
-python3 compiler.py <program.asm>
-./main <program.bin>
+Demichu5 CPU Architecture - Reference Manual[cite: 1]
+Version 1.0 (Rev. 2026) 8-Bit Architecture[cite: 1]
 
 ---
 
-### Table of Contents
-1. Programming Model
-2. Instruction Format
-3. Instruction Set Architecture (ISA)
-4. Assembler Directives
-5. Example Program (Bubble Sort)
-6. Licensing
+### 1. Programming Model[cite: 1]
+
+1.1 Memory Organization[cite: 1]
+- Address Space: 64 KB (65,536 Bytes)[cite: 1]
+- Architecture: Von Neumann (shared code and data)[cite: 1]
+- Data Word: 8 Bits (1 Byte)[cite: 1]
+- Address Bus: 16 Bits (2 Bytes)[cite: 1]
+- Byte Order: Little-Endian[cite: 1]
+
+1.2 General Purpose Registers[cite: 1]
+- R0 - R15: 16 8-bit registers for data and counters.[cite: 1]
+
+1.3 Special and Pointer Registers[cite: 1]
+- PC: 16-bit Program Counter (+2 per fetch).[cite: 1]
+- PTR: 16-bit Pointer Register (High/Low) for load/store.[cite: 1]
+
+1.4 Status Register[cite: 1]
+- Z (ZERO): Set if result is 0.[cite: 1]
+- C (CARRY): Set if result > 255.[cite: 1]
+- N (NEGATIVE): Set if result is negative.[cite: 1]
 
 ---
 
-# 1. Programming Model
-1.1 Memory Organization
-    * Address Space: 64 KB (65,536 Bytes)
-    * Architecture: Von Neumann (shared code and data space)
-    * Data Word: 8 Bits (1 Byte)
-    * Address Bus: 16 Bits (2 Bytes)
-    * Byte Order: Little-Endian
+### 2. Instruction Format[cite: 1]
 
-1.2 General Purpose Registers
-    * R0 - R15: 16 8-bit registers for temporary data and counters.
-
-1.3 Special and Pointer Registers
-    * PC: 16-bit Program Counter (auto-increment +2).
-    * PTR: 16-bit Pointer Register (High/Low) for load/store operations.
-
-1.4 Status Register
-    * Z Flag (ZERO): Set if result is 0.
-    * C Flag (CARRY): Set if result > 255.
-    * N Flag (NEGATIVE): Set if result is negative.
+Length: 2 Bytes (16 bits)[cite: 1]
+Encoding: [ 8 bits : OPCODE ] [ 8 bits : ARGUMENT ][cite: 1]
 
 ---
 
-# 2. Instruction Format
-Length: 2 Bytes (16 bits).
-Encoding: [ 8 bits : OPCODE ] [ 8 bits : ARGUMENT ]
-Argument types: Immediate, Register (4 bits), or Register-Register (nibbles).
+### 3. Instruction Set Architecture (ISA)[cite: 1]
+
+3.1 Data Transfer[cite: 1]
+- set   (0x11) rD      : Select active register[cite: 1]
+- mov   (0x12) imm8    : act = imm8[cite: 1]
+- cpy   (0x13) rD rS   : rD = rS[cite: 1]
+- ptr   (0x14) rH rL   : Set PTR High/Low[cite: 1]
+- load  (0x17) rD      : rD = MEM[PTR][cite: 1]
+- store (0x18) rS      : MEM[PTR] = rS[cite: 1]
+- push  (0x19) rS      : STACK[SP++] = rS[cite: 1]
+- pop   (0x1A) rD      : rD = STACK[--SP][cite: 1]
+
+3.2 Arithmetic (ALU)[cite: 1]
+- add (0x21) rD rS : rD = rD + rS (Flags: Z, C)[cite: 1]
+- sub (0x22) rD rS : rD = rD - rS (Flags: Z, N)[cite: 1]
+- cmp (0x23) rD rS : rD - rS (Flags only)[cite: 1]
+- inc (0x24) rD    : rD++ (Flag: Z)[cite: 1]
+- dec (0x25) rD    : rD-- (Flag: Z)[cite: 1]
+
+3.3 Flow Control[cite: 1]
+- jmp   (0x33) Label : Unconditional jump[cite: 1]
+- jmp_z (0x34) Label : Jump if NOT ZERO[cite: 1]
+- jmp_c (0x35) Label : Jump if NO CARRY[cite: 1]
+- jmp_n (0x36) Label : Jump if POSITIVE[cite: 1]
+- call  (0x37) Label : Call function[cite: 1]
+- ret   (0x38)       : Return[cite: 1]
+- halt  (0x00)       : Stop CPU[cite: 1]
 
 ---
 
-# 3. Instruction Set Architecture (ISA)
+### 4. Assembler Directives[cite: 1]
 
-3.1 Data Transfer
-Mnemonic    Opcode      Operand     Description
-set         0x11        rD          Selects rD as active register for mov
-mov         0x12        imm8        act = imm8
-cpy         0x13        rD rS       rD = rS
-ptr         0x14        rH rL       PTR_High = rH, PTR_Low = rL
-ptrh        0x15        imm8        PTR_High = imm8
-ptrl        0x16        imm8        PTR_Low  = imm8
-load        0x17        rD          rD = MEM[PTR]
-store       0x18        rS          MEM[PTR] = rS
-push        0x19        rS          STACK[SP++] = rS
-pop         0x1A        rD          rD = STACK[--SP]
-
-3.2 Arithmetic and Logic (ALU)
-Mnemonic    Opcode      Operand     Flags       Description
-add         0x21        rD rS       Z, C        rD = rD + rS
-sub         0x22        rD rS       Z, N        rD = rD - rS
-cmp         0x23        rD rS       Z, N, C     rD - rS (updates flags only)
-inc         0x24        rD          Z           rD = rD + 1
-dec         0x25        rD          Z           rD = rD - 1
-
-3.3 Flow Control
-Mnemonic    Opcode      Operand     Condition       Description
-jmp         0x33        Label       -               Unconditional jump
-jmp_z       0x34        Label       Z == 0          Jump if NOT ZERO
-jmp_c       0x35        Label       C == 0          Jump if NO CARRY
-jmp_n       0x36        Label       N == 0          Jump if POSITIVE
-call        0x37        Label       -               STACK[SP++] = PC
-ret         0x38        -           -               PC = STACK[--SP]
-halt        0x00        -           -               Stops CPU clock
+- .code : Instruction section[cite: 1]
+- .data : Variable section[cite: 1]
+- var <name> <size> <value> : Define variable[cite: 1]
 
 ---
 
-# 4. Assembler Directives
-* .code - instruction section
-* .data - variable section
-* var <name> <size> <value>
-    * var buffer[10] (array of 0s)
-    * var string "Text" (null-terminated)
+### 5. Example Program (Bubble Sort)[cite: 1]
+
+.data[cite: 1]
+var numbers[5] {5 1 4 2 8}[cite: 1]
+
+.code[cite: 1]
+fn MAIN[cite: 1]
+    set r5[cite: 1]
+    mov 20[cite: 1]
+    set r0[cite: 1]
+    mov 0[cite: 1]
+    set r15[cite: 1]
+    mov 0[cite: 1]
+
+MAIN_LOOP:[cite: 1]
+    cmp r5 r0[cite: 1]
+    jmp_z START_PASS[cite: 1]
+    halt[cite: 1]
+
+START_PASS:[cite: 1]
+    set r10[cite: 1]
+    mov numbers[cite: 1]
+    set r11[cite: 1]
+    mov numbers[cite: 1]
+    inc r11[cite: 1]
+    set r4[cite: 1]
+    mov 4[cite: 1]
+
+INNER_LOOP:[cite: 1]
+    cmp r4 r0[cite: 1]
+    jmp_z CHECK_PAIR[cite: 1]
+    jmp NEXT_MAIN_PASS[cite: 1]
+
+CHECK_PAIR:[cite: 1]
+    ptr r15 r10[cite: 1]
+    load r1 PTR[cite: 1]
+    ptr r15 r11[cite: 1]
+    load r2 PTR[cite: 1]
+    cmp r1 r2[cite: 1]
+    jmp_n DO_SWAP[cite: 1]
+    jmp CONTINUE[cite: 1]
+
+DO_SWAP:[cite: 1]
+    ptr r15 r11[cite: 1]
+    store r1 PTR[cite: 1]
+    ptr r15 r10[cite: 1]
+    store r2 PTR[cite: 1]
+
+CONTINUE:[cite: 1]
+    inc r10[cite: 1]
+    inc r11[cite: 1]
+    dec r4[cite: 1]
+    jmp INNER_LOOP[cite: 1]
+
+NEXT_MAIN_PASS:[cite: 1]
+    dec r5[cite: 1]
+    jmp MAIN_LOOP[cite: 1]
 
 ---
 
-# 5. Example Program (Bubble Sort)
-; bubblesort.asm
-.data
-    var numbers[5] {5 1 4 2 8}
+### 6. Licensing[cite: 1]
 
-.code
-fn MAIN
-    set r5
-    mov 20
-    set r0
-    mov 0
-    set r15
-    mov 0
-
-MAIN_LOOP:
-    cmp r5 r0
-    jmp_z START_PASS
-    halt
-
-START_PASS:
-    set r10
-    mov numbers
-    set r11
-    mov numbers
-    inc r11
-    set r4
-    mov 4
-
-INNER_LOOP:
-    cmp r4 r0
-    jmp_z CHECK_PAIR
-    jmp NEXT_MAIN_PASS
-
-CHECK_PAIR:
-    ptr r15 r10
-    load r1 PTR
-    ptr r15 r11
-    load r2 PTR
-    cmp r1 r2
-    jmp_n DO_SWAP
-    jmp CONTINUE
-
-DO_SWAP:
-    ptr r15 r11
-    store r1 PTR
-    ptr r15 r10
-    store r2 PTR
-
-CONTINUE:
-    inc r10
-    inc r11
-    dec r4
-    jmp INNER_LOOP
-
-NEXT_MAIN_PASS:
-    dec r5
-    jmp MAIN_LOOP
-
----
-
-# 6. Licensing
-Copyright (C) 2025 Demichu5
-Licensed under GNU General Public License (GPL) version 3.
-
-Commercial Licensing: Available for proprietary products. Contact author for terms.
+Copyright (C) 2025 Demichu5[cite: 1]
+Licensed under GPLv3. Commercial licenses available upon contact.[cite: 1]

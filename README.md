@@ -50,7 +50,7 @@ Argument types: Immediate, Register (4 bits), or Register-Register (nibbles).
 ---
 ```
 # 3. Instruction Set Architecture (ISA)
-```
+
 3.1 Data Transfer
 Mnemonic    Opcode      Operand     Description
 set         0x11        rD          Selects rD as active register for mov
@@ -63,7 +63,7 @@ load        0x17        rD          rD = MEM[PTR]
 store       0x18        rS          MEM[PTR] = rS
 push        0x19        rS          STACK[SP++] = rS
 pop         0x1A        rD          rD = STACK[--SP]
-```
+
 3.2 Arithmetic and Logic (ALU)
 Mnemonic    Opcode      Operand     Flags       Description
 add         0x21        rD rS       Z, C        rD = rD + rS
@@ -71,7 +71,7 @@ sub         0x22        rD rS       Z, N        rD = rD - rS
 cmp         0x23        rD rS       Z, N, C     rD - rS (updates flags only)
 inc         0x24        rD          Z           rD = rD + 1
 dec         0x25        rD          Z           rD = rD - 1
-```
+
 3.3 Flow Control
 Mnemonic    Opcode      Operand     Condition       Description
 jmp         0x33        Label       -               Unconditional jump
@@ -152,11 +152,11 @@ NEXT_MAIN_PASS:
     jmp MAIN_LOOP
 ```
 ---
-```
+
 # 6. Licensing
 Copyright (C) 2025 Demichu5
 Licensed under GNU General Public License (GPL) version 3.
 
 Commercial Licensing: Available for proprietary products. Contact author for terms.
-```
+
 ---
